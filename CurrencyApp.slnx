@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CurrencyApp.Api/CurrencyApp.Api.csproj" />
+    <Project Path="src/CurrencyApp.Application/CurrencyApp.Application.csproj" />
+    <Project Path="src/CurrencyApp.Domain/CurrencyApp.Domain.csproj" />
+    <Project Path="src/CurrencyApp.Infra/CurrencyApp.Infra.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CurrencyApp.Application.Tests/CurrencyApp.Application.Tests.csproj" />
+  </Folder>
+</Solution>
