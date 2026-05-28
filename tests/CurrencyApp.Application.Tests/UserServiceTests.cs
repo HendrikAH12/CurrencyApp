@@ -1,5 +1,6 @@
 ﻿using CurrencyApp.Application.Common.Pagination;
 using CurrencyApp.Application.Common.Results;
+using CurrencyApp.Application.Contracts;
 using CurrencyApp.Application.DTOs.UserCurrencies;
 using CurrencyApp.Application.DTOs.Users;
 using CurrencyApp.Application.Services;
@@ -17,6 +18,7 @@ public class UserServiceTests
 
     private readonly Mock<IUserRepository> _userRepositoryMock;
     private readonly Mock<ICurrencyRepository> _currencyRepositoryMock;
+    private readonly Mock<IExchangeRateService> _exchangeRateServiceMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
 
     private readonly UserService _service;
@@ -25,11 +27,13 @@ public class UserServiceTests
     {
         _userRepositoryMock = new Mock<IUserRepository>();
         _currencyRepositoryMock = new Mock<ICurrencyRepository>();
+        _exchangeRateServiceMock = new Mock<IExchangeRateService>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
 
         _service = new UserService(
             _userRepositoryMock.Object,
             _currencyRepositoryMock.Object,
+            _exchangeRateServiceMock.Object,
             _unitOfWorkMock.Object
         );
     }
@@ -64,6 +68,10 @@ public class UserServiceTests
             .Setup(x => x.GetByIdAsync(1))
             .ReturnsAsync(user);
 
+        _exchangeRateServiceMock
+            .Setup(x => x.GetRateAsync("USD", "USD", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
+
         var result = await _service.GetByIdAsync(1);
 
         result.Type.Should().Be(ResultType.Success);
@@ -77,6 +85,7 @@ public class UserServiceTests
         result.Data.Holdings[0].CurrencyId.Should().Be(10);
         result.Data.Holdings[0].CurrencyCode.Should().Be("USD");
         result.Data.Holdings[0].Amount.Should().Be(250);
+        result.Data.TotalInMainCurrency.Should().Be(250);
     }
 
     [Fact]

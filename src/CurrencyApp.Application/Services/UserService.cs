@@ -14,12 +14,14 @@ public class UserService : IUserService
     private const int PageSize = 10;
     private readonly IUserRepository _userRepository;
     private readonly ICurrencyRepository _currencyRepository;
+    private readonly IExchangeRateService _exchangeRateService;
     private readonly IUnitOfWork _unitOfWork;
 
-    public UserService(IUserRepository userRepository, ICurrencyRepository currencyRepository, IUnitOfWork unitOfWork)
+    public UserService(IUserRepository userRepository, ICurrencyRepository currencyRepository, IExchangeRateService exchangeRateService, IUnitOfWork unitOfWork)
     {
         _userRepository = userRepository;
         _currencyRepository = currencyRepository;
+        _exchangeRateService = exchangeRateService;
         _unitOfWork = unitOfWork;
     }
 
@@ -30,7 +32,26 @@ public class UserService : IUserService
         if (user is null)
             return Result<UserResponse>.NotFound("User not found.");
 
-        return Result<UserResponse>.Success(MapToResponse(user));
+        var response = MapToResponse(user);
+
+        if (user.MainCurrency is null)
+            return Result<UserResponse>.Success(response);
+
+        decimal totalInMainCurrency = 0;
+        foreach (var holding in user.Holdings)
+        {
+            var rate = await _exchangeRateService.GetRateAsync(holding.Currency.Code, user.MainCurrency.Code);
+            if (rate == 0)
+            {
+                response.TotalInMainCurrency = null;
+                return Result<UserResponse>.Success(response);
+            }
+
+            totalInMainCurrency += holding.Amount * rate;
+        }
+
+        response.TotalInMainCurrency = Math.Round(totalInMainCurrency, 2);
+        return Result<UserResponse>.Success(response);
     }
 
     public async Task<Result<CursorPagedResponse<UserResponse>>> GetAllAsync(string? cursor = null)

@@ -1,4 +1,6 @@
-﻿namespace CurrencyApp.Domain.Entities;
+﻿using CurrencyApp.Domain.Common;
+
+namespace CurrencyApp.Domain.Entities;
 
 public class Currency
 {
@@ -16,17 +18,7 @@ public class Currency
         SetName(name);
     }
 
-    public void SetCode(string code)
-    {
-        if (string.IsNullOrWhiteSpace(code))
-            throw new ArgumentException("Code cannot be empty.");
-
-        code = code.Trim().ToUpperInvariant();
-        if (code.Length != 3 || !code.All(char.IsLetter))
-            throw new ArgumentException("Code must be a 3-letter ISO currency code.");
-
-        Code = code;
-    }
+    public void SetCode(string code) => Code = CurrencyCodeRules.Normalize(code);
 
     public void SetName(string name)
     {

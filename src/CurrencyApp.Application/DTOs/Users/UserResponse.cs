@@ -10,4 +10,5 @@ public sealed class UserResponse
     public int? MainCurrencyId { get; init; }
     public string? MainCurrencyCode { get; init; }
     public IReadOnlyList<UserCurrencyResponse> Holdings { get; init; } = [];
+    public decimal? TotalInMainCurrency { get; set; }
 }

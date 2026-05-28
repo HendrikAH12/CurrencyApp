@@ -1,5 +1,7 @@
+using CurrencyApp.Application.Contracts;
 using CurrencyApp.Domain.Interfaces;
 using CurrencyApp.Infra.Context;
+using CurrencyApp.Infra.External;
 using CurrencyApp.Infra.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +17,8 @@ public static class DependencyInjection
 
         services.AddScoped<ICurrencyRepository, CurrencyRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IExchangeRateCacheRepository, ExchangeRateCacheRepository>();
+        services.AddHttpClient<IExchangeRateProvider, FrankfurterExchangeRateProvider>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

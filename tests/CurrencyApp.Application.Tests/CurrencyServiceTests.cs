@@ -209,7 +209,7 @@ public class CurrencyServiceTests
         var act = () => _service.CreateAsync(request, CancellationToken.None);
 
         await act.Should().ThrowAsync<ArgumentException>()
-            .WithMessage("Code must be a 3-letter ISO currency code.");
+            .WithMessage("*Currency code must be a 3-letter ISO code.*");
         _currencyRepositoryMock.Verify(x => x.GetByCodeAsync(It.IsAny<string>()), Times.Never);
         _currencyRepositoryMock.Verify(x => x.AddAsync(It.IsAny<Currency>()), Times.Never);
         _unitOfWorkMock.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);

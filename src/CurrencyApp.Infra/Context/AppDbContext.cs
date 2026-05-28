@@ -12,6 +12,7 @@ public class AppDbContext : DbContext
     public DbSet<Currency> Currencies => Set<Currency>();
     public DbSet<User> Users => Set<User>();
     public DbSet<UserCurrency> UserCurrencies => Set<UserCurrency>();
+    public DbSet<ExchangeRateCache> ExchangeRateCaches => Set<ExchangeRateCache>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

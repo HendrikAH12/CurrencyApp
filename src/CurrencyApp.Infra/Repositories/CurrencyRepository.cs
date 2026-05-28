@@ -1,3 +1,4 @@
+using CurrencyApp.Domain.Common;
 using CurrencyApp.Domain.Entities;
 using CurrencyApp.Domain.Interfaces;
 using CurrencyApp.Infra.Context;
@@ -23,7 +24,7 @@ public class CurrencyRepository : ICurrencyRepository
 
     public async Task<Currency?> GetByCodeAsync(string code)
     {
-        var normalizedCode = code.Trim().ToUpperInvariant();
+        var normalizedCode = CurrencyCodeRules.Normalize(code);
 
         return await _context.Currencies
             .AsNoTracking()
