@@ -20,26 +20,23 @@ public class FrankfurterExchangeRateProvider : IExchangeRateProvider
             var requestUrl = $"{BaseUrl}/latest?from={fromCode}&to={toCode}";
 
             using var response = await _httpClient.GetAsync(requestUrl, ct);
-            if (!response.IsSuccessStatusCode)
-                return (false, 0);
+            if (response.IsSuccessStatusCode)
+            {
+                await using var stream = await response.Content.ReadAsStreamAsync(ct);
+                using var json = await JsonDocument.ParseAsync(stream, cancellationToken: ct);
 
-            await using var stream = await response.Content.ReadAsStreamAsync(ct);
-            using var json = await JsonDocument.ParseAsync(stream, cancellationToken: ct);
-
-            if (!json.RootElement.TryGetProperty("rates", out var rates))
-                return (false, 0);
-
-            if (!rates.TryGetProperty(toCode, out var rateElement))
-                return (false, 0);
-
-            if (!rateElement.TryGetDecimal(out var rate))
-                return (false, 0);
-
-            return (true, rate);
+                if (json.RootElement.TryGetProperty("rates", out var rates)
+                    && rates.TryGetProperty(toCode, out var rateElement)
+                    && rateElement.TryGetDecimal(out var rate))
+                {
+                    return (true, rate);
+                }
+            }
         }
-        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException)
+        catch (Exception)
         {
-            return (false, 0);
         }
+
+        return (false, 0);
     }
 }
